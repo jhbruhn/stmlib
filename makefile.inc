@@ -46,6 +46,7 @@ PGM_SERIAL_VERIFY ?= -v
 
 TOOLCHAIN_BIN  = $(TOOLCHAIN_PATH)bin/
 STM32_PATH     = stmlib/third_party/STM
+U8G2_PATH      = stmlib/third_party/u8g2
 
 # --- Do not modify anything below this point ----------------------------------
 
@@ -76,6 +77,7 @@ OPENOCD_SCRIPTS_PATH = stmlib/programming/jtag/
 VPATH          = $(PACKAGES)
 
 CC_FILES       = $(notdir $(wildcard $(patsubst %,%/*.cc,$(PACKAGES))))
+CPP_FILES      = $(notdir $(wildcard $(patsubst %,%/*.cpp,$(PACKAGES))))
 C_FILES        = $(notdir $(wildcard $(patsubst %,%/*.c,$(PACKAGES))))
 AS_FILES       = $(notdir $(wildcard $(patsubst %,%/*.s,$(PACKAGES))))
 
@@ -239,12 +241,17 @@ FW_USB_DIR = $(STM32_PATH)/STM32_USB-FS-Device_Driver
 FW_USB_SRCDIR = $(FW_USB_DIR)/src
 FW_USB_INCDIR = $(FW_USB_DIR)/inc
 
+FW_U8G2_DIR = $(U8G2_PATH)
+FW_U8G2_CPPDIR = $(FW_U8G2_DIR)/cppsrc
+FW_U8G2_CDIR = $(FW_U8G2_DIR)/csrc
+
 INCFLAGS += -I$(STM32_PATH) -I$(FW_CORE_DIR) -I$(FW_STARTUP_DIR) -I$(FW_STDDRIVER_INCDIR)
 VPATH += $(FW_CORE_DIR) $(FW_STARTUP_DIR) $(FW_STDDRIVER_SRCDIR) $(STM32_PATH) $(FW_BUILD_DIR)
 
 CORE_C_FILES = $(notdir $(wildcard $(patsubst %,%/*.c,$(FW_CORE_DIR))))
 DRIVERS_C_FILES = $(notdir $(wildcard $(patsubst %,%/*.c,$(FW_STDDRIVER_SRCDIR))))
 USB_C_FILES = $(notdir $(wildcard $(patsubst %,%/*.c,$(FW_USB_SRCDIR))))
+U8G2_C_FILES = $(notdir $(wildcard $(patsubst %,%/*.c,$(FW_U8G2_CDIR))))
 
 C_FILES += $(CORE_C_FILES)
 C_FILES += $(DRIVERS_C_FILES)
@@ -255,6 +262,11 @@ VPATH += $(FW_USB_SRCDIR)
 C_FILES += $(USB_C_FILES)
 endif
 
+ifeq ($(U8G2),enabled)
+INCFLAGS += -I$(FW_U8G2_CDIR) -I$(FW_U8G2_CPPDIR) 
+VPATH += $(FW_U8G2_CPPDIR) $(FW_U8G2_CDIR)
+C_FILES += $(U8G2_C_FILES)
+endif
 
 # ------------------------------------------------------------------------------
 # Source compiling and dependency analysis
@@ -269,6 +281,9 @@ $(BUILD_DIR)%.o: %.c
 $(BUILD_DIR)%.o: %.cc
 	$(CXX) -c $(CCFLAGS) $(CPPFLAGS) $< -o $@
 
+$(BUILD_DIR)%.o: %.cpp
+	$(CXX) -c $(CCFLAGS) $(CPPFLAGS) $< -o $@
+
 $(BUILD_DIR)%.d: %.s
 	$(CC) -c -x assembler-with-cpp -MM $(ASFLAGS) $< -MF $@ -MT $(@:.d=.o)
 
@@ -278,6 +293,8 @@ $(BUILD_DIR)%.d: %.c
 $(BUILD_DIR)%.d: %.cc
 	$(CXX) -MM $(CCFLAGS) $(CPPFLAGS) $< -MF $@ -MT $(@:.d=.o)
 
+$(BUILD_DIR)%.d: %.cpp
+	$(CXX) -MM $(CCFLAGS) $(CPPFLAGS) $< -MF $@ -MT $(@:.d=.o)
 
 # ------------------------------------------------------------------------------
 # Object file conversion
@@ -300,7 +317,7 @@ $(BUILD_DIR)%.sym: $(BUILD_DIR)%.elf
 # What to build
 # ------------------------------------------------------------------------------
 
-OBJ_FILES      = $(CC_FILES:.cc=.o) $(C_FILES:.c=.o) $(AS_FILES:.s=.o)
+OBJ_FILES      = $(CPP_FILES:.cpp=.o) $(CC_FILES:.cc=.o) $(C_FILES:.c=.o) $(AS_FILES:.s=.o)
 OBJS           = $(patsubst %,$(BUILD_DIR)%,$(OBJ_FILES)) $(STARTUP_OBJ)
 DEPS           = $(OBJS:.o=.d)
 
