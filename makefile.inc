@@ -8,10 +8,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in
 # all copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
-# 
+#
 # See http://creativecommons.org/licenses/MIT/ for more information.
 
 # ------------------------------------------------------------------------------
@@ -111,7 +111,7 @@ MODEL_DEFINE = STM32F37X -DARM_MATH_CM4 -D__FPU_PRESENT
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f37x.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32f373x_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F37x_StdPeriph_Driver
-ARCHFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb-interwork -funroll-loops --specs=nano.specs
+ARCHFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb-interwork -funroll-loops --specs=nano.specs -specs=nosys.specs
 ARCH_DEFINE = GCC_ARMCM4
 OPENOCD_TARGET = f3x
 
@@ -263,7 +263,7 @@ C_FILES += $(USB_C_FILES)
 endif
 
 ifeq ($(U8G2),enabled)
-INCFLAGS += -I$(FW_U8G2_CDIR) -I$(FW_U8G2_CPPDIR) 
+INCFLAGS += -I$(FW_U8G2_CDIR) -I$(FW_U8G2_CPPDIR)
 VPATH += $(FW_U8G2_CPPDIR) $(FW_U8G2_CDIR)
 C_FILES += $(U8G2_C_FILES)
 endif
