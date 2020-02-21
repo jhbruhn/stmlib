@@ -1,4 +1,4 @@
-/* vim: set filetype=make : */
+#/* vim: set filetype=make : */
 
 # Copyright 2012 Emilie Gillet.
 #
