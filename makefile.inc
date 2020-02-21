@@ -203,7 +203,7 @@ INCFLAGS = \
 			-D$(SYSCLOCK)=$(F_CPU)
 
 CCFLAGS = \
-			-g -O2 -Wall -Werror -Wno-unused-local-typedefs -Wno-strict-aliasing \
+			-g -Og -Wall -Werror -Wno-unused-local-typedefs -Wno-strict-aliasing \
 			-fasm \
 			-finline \
 			-finline-functions-called-once \
@@ -223,6 +223,7 @@ LDFLAGS = \
 			-Wl,-Map=$(BUILD_DIR)$(TARGET).map \
 			-Wl,--gc-sections \
 			-T $(LINKER_SCRIPT) \
+      -u _printf_float \
 			$(ARCHFLAGS) \
 			$(INCFLAGS) \
 			-L$(STM32_PATH)
