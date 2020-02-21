@@ -30,7 +30,8 @@
 
 TOOLCHAIN_PATH ?= /usr/local/arm/
 
-PGM_INTERFACE ?= stlink-v2
+PGM_INTERFACE ?= jlink
+#PGM_INTERFACE ?= stlink-v2
 # PGM_INTERFACE ?= ftdi/olimex-arm-jtag-swd
 # PGM_INTERFACE ?= ftdi/olimex-arm-usb-ocd-h
 
@@ -118,6 +119,7 @@ FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F37x_StdPeriph_Driver
 ARCHFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb-interwork -funroll-loops --specs=nano.specs -specs=nosys.specs
 ARCH_DEFINE = GCC_ARMCM4
 OPENOCD_TARGET = f3x
+OZONE_DEVICE = STM32F373CC
 
 else ifeq ($(FAMILY),f0xx)
 
@@ -455,6 +457,13 @@ image_jtag_1M:
 	$(BASE_JTAG_CMD) \
 		-c "dump_image image.bin 0x08000000 1048576" \
 		$(POSTLUDE)
+
+ozone:
+	$(OZONE_BIN_PATH)Ozone \
+		-programfile $(TARGET_ELF) \
+		-device $(OZONE_DEVICE) \
+		-select USB \
+		-if SWD
 
 debug_server: $(TARGET_BIN)
 	$(OPENOCD_BIN_PATH)openocd \
