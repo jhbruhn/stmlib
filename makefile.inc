@@ -223,7 +223,7 @@ LDFLAGS = \
 			-Wl,-Map=$(BUILD_DIR)$(TARGET).map \
 			-Wl,--gc-sections \
 			-T $(LINKER_SCRIPT) \
-      -u _printf_float \
+			-u _printf_float \
 			$(ARCHFLAGS) \
 			$(INCFLAGS) \
 			-L$(STM32_PATH)
