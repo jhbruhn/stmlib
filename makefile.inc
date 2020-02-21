@@ -1,3 +1,5 @@
+/* vim: set filetype=make : */
+
 # Copyright 2012 Emilie Gillet.
 #
 # Author: Emilie Gillet (emilie.o.gillet@gmail.com)
