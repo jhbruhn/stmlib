@@ -28,7 +28,7 @@
 # Files and directories
 # ------------------------------------------------------------------------------
 
-TOOLCHAIN_PATH ?= /usr/local/arm/
+TOOLCHAIN_PATH ?= /usr/
 
 PGM_INTERFACE ?= jlink
 #PGM_INTERFACE ?= stlink-v2
