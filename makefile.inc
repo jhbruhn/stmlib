@@ -52,6 +52,7 @@ PGM_SERIAL_VERIFY ?= -v
 TOOLCHAIN_BIN  = $(TOOLCHAIN_PATH)bin/
 STM32_PATH     = stmlib/third_party/STM
 U8G2_PATH      = stmlib/third_party/u8g2
+U8G2_SUPPORT_PATH      = stmlib/third_party/u8g2_support
 
 # --- Do not modify anything below this point ----------------------------------
 
@@ -270,7 +271,7 @@ C_FILES += $(USB_C_FILES)
 endif
 
 ifeq ($(U8G2),enabled)
-INCFLAGS += -I$(FW_U8G2_CDIR) -I$(FW_U8G2_CPPDIR)
+INCFLAGS += -I$(FW_U8G2_CDIR) -I$(FW_U8G2_CPPDIR) -I$(U8G2_SUPPORT_PATH)
 VPATH += $(FW_U8G2_CPPDIR) $(FW_U8G2_CDIR)
 C_FILES += $(U8G2_C_FILES)
 endif
