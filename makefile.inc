@@ -228,11 +228,13 @@ LDFLAGS = \
 			-Wl,-Map=$(BUILD_DIR)$(TARGET).map \
 			-Wl,--gc-sections \
 			-T $(LINKER_SCRIPT) \
-			-u _printf_float \
 			$(ARCHFLAGS) \
 			$(INCFLAGS) \
 			-L$(STM32_PATH)
 
+ifeq ($(PRINTF_FLOATS), enabled)
+	LDFLAGS += -u _printf_float
+endif
 
 # ------------------------------------------------------------------------------
 # Files and directories for the system firmware
