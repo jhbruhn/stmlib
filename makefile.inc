@@ -359,12 +359,12 @@ $(TARGET)/resources.cc: $(wildcard $(RESOURCES)/*.py)
 # ------------------------------------------------------------------------------
 
 stmlib/third_party/libopencm3/lib/$(OPENCM3_LIB):
-	cd stmlib/third_party/libopencm3 && make && cd ../../../
+	cd stmlib/third_party/libopencm3 && make PREFIX=$(TOOLCHAIN_BIN)arm-none-eabi- && cd ../../../
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(TARGET_ELF): $(OBJS)
+$(TARGET_ELF): $(OBJS) stmlib/third_party/libopencm3/lib/$(OPENCM3_LIB)
 	$(CC) $(LDFLAGS) -o $(TARGET_ELF) $(OBJS) stmlib/third_party/libopencm3/lib/$(OPENCM3_LIB)
 
 
@@ -376,6 +376,7 @@ bin: $(TARGET_BIN)
 hex: $(TARGET_HEX)
 
 clean:
+	cd stmlib/third_party/libopencm3 && make clean && cd ../../../
 	$(REMOVE) $(OBJS) $(TARGETS) $(DEP_FILE) $(DEPS)
 
 depends: $(DEPS)
