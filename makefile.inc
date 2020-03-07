@@ -53,7 +53,6 @@ TOOLCHAIN_BIN  = $(TOOLCHAIN_PATH)bin/
 STM32_PATH     = stmlib/third_party/STM
 U8G2_PATH      = stmlib/third_party/u8g2
 U8G2_SUPPORT_PATH      = stmlib/third_party/u8g2_support
-OPENCM3_PATH = stmlib/third_party/libopencm3
 
 # --- Do not modify anything below this point ----------------------------------
 
@@ -104,8 +103,7 @@ DEP_FILE       = $(BUILD_DIR)depends.mk
 
 ifeq ($(FAMILY),f4xx)
 
-OPENCM3_LIB = libopencm3_stm32f4.a
-MODEL_DEFINE = STM32F40_41xxx -DSTM32F4XX -DARM_MATH_CM4 -D__FPU_PRESENT -DSTM32F4
+MODEL_DEFINE = STM32F40_41xxx -DSTM32F4XX -DARM_MATH_CM4 -D__FPU_PRESENT
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f4xx.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32f4xx_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F4xx_StdPeriph_Driver
@@ -115,8 +113,7 @@ OPENOCD_TARGET = f4x
 
 else ifeq ($(FAMILY),f37x)
 
-OPENCM3_LIB = libopencm3_stm32f3.a
-MODEL_DEFINE = STM32F37X -DARM_MATH_CM4 -D__FPU_PRESENT -DSTM32F3
+MODEL_DEFINE = STM32F37X -DARM_MATH_CM4 -D__FPU_PRESENT
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f37x.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32f373x_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F37x_StdPeriph_Driver
@@ -127,8 +124,7 @@ OZONE_DEVICE = STM32F373CC
 
 else ifeq ($(FAMILY),f0xx)
 
-OPENCM3_LIB = libopencm3_stm32f0.a
-MODEL_DEFINE = STM32F0XX -DSTM32F0
+MODEL_DEFINE = STM32F0XX
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f0xx.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32f0xx_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F0xx_StdPeriph_Driver
@@ -138,8 +134,7 @@ OPENOCD_TARGET = f0x
 
 else ifeq ($(FAMILY),f7xx)
 
-OPENCM3_LIB = libopencm3_stm32f7.a
-MODEL_DEFINE = STM32F7XX -DSTM32F765xx -DARM_MATH_CM7 -D__FPU_PRESENT -DSTM32F7
+MODEL_DEFINE = STM32F7XX -DSTM32F765xx -DARM_MATH_CM7 -D__FPU_PRESENT
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f765xx.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32f7xx_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F7xx_HAL_Driver
@@ -149,8 +144,7 @@ OPENOCD_TARGET = f7x
 
 else ifeq ($(FAMILY),h7xx)
 
-OPENCM3_LIB = libopencm3_stm32h7.a
-MODEL_DEFINE = STM32H7XX -DSTM32H743xx -DARM_MATH_CM7 -D__FPU_PRESENT -DSTM32F7
+MODEL_DEFINE = STM32H7XX -DSTM32H743xx -DARM_MATH_CM7 -D__FPU_PRESENT
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32h743xx.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32h7xx_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32H7xx_HAL_Driver
@@ -161,11 +155,11 @@ OPENOCD_TARGET = h7x_dual_bank
 else
 
 ifeq ($(DENSITY),hd)
-MODEL_DEFINE = STM32F10X_HD -DSTM32F10X -DSTM32F1
+MODEL_DEFINE = STM32F10X_HD -DSTM32F10X
 else ifeq ($(DENSITY),md)
-MODEL_DEFINE = STM32F10X_MD -DSTM32F10X -DSTM32F1
+MODEL_DEFINE = STM32F10X_MD -DSTM32F10X
 else
-MODEL_DEFINE = STM32F10X_CL -DSTM32F10X -DSTM32F1
+MODEL_DEFINE = STM32F10X_CL -DSTM32F10X
 endif
 
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f10x_$(DENSITY).o
@@ -214,7 +208,7 @@ INCFLAGS = \
 			-D$(SYSCLOCK)=$(F_CPU)
 
 CCFLAGS = \
-			-g -Wall -Werror -Wno-unused-local-typedefs -Wno-strict-aliasing \
+			-g -Og -Wall -Werror -Wno-unused-local-typedefs -Wno-strict-aliasing \
 			-fasm \
 			-finline \
 			-finline-functions-called-once \
@@ -261,10 +255,8 @@ FW_U8G2_DIR = $(U8G2_PATH)
 FW_U8G2_CPPDIR = $(FW_U8G2_DIR)/cppsrc
 FW_U8G2_CDIR = $(FW_U8G2_DIR)/csrc
 
-OPENCM3_DIR = $(OPENCM3_PATH)/include/libopencm3/stm32
-
-INCFLAGS += -I$(STM32_PATH) -I$(FW_CORE_DIR) -I$(FW_STARTUP_DIR) -I$(OPENCM3_PATH)/include/ -I$(OPENCM3_DIR) -I$(FW_STDDRIVER_INCDIR)
-VPATH += $(FW_CORE_DIR) $(FW_STARTUP_DIR) $(FW_STDDRIVER_SRCDIR) $(STM32_PATH) -I$(OPENCM3_PATH)/include/ $(OPENCM3_DIR) $(FW_BUILD_DIR)
+INCFLAGS += -I$(STM32_PATH) -I$(FW_CORE_DIR) -I$(FW_STARTUP_DIR) -I$(FW_STDDRIVER_INCDIR)
+VPATH += $(FW_CORE_DIR) $(FW_STARTUP_DIR) $(FW_STDDRIVER_SRCDIR) $(STM32_PATH) $(FW_BUILD_DIR)
 
 CORE_C_FILES = $(notdir $(wildcard $(patsubst %,%/*.c,$(FW_CORE_DIR))))
 DRIVERS_C_FILES = $(notdir $(wildcard $(patsubst %,%/*.c,$(FW_STDDRIVER_SRCDIR))))
@@ -358,15 +350,11 @@ $(TARGET)/resources.cc: $(wildcard $(RESOURCES)/*.py)
 # Main rules
 # ------------------------------------------------------------------------------
 
-stmlib/third_party/libopencm3/lib/$(OPENCM3_LIB):
-	cd stmlib/third_party/libopencm3 && make PREFIX=$(TOOLCHAIN_BIN)arm-none-eabi- && cd ../../../
-
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 
-$(TARGET_ELF): $(OBJS) stmlib/third_party/libopencm3/lib/$(OPENCM3_LIB)
-	$(CC) $(LDFLAGS) -o $(TARGET_ELF) $(OBJS) stmlib/third_party/libopencm3/lib/$(OPENCM3_LIB)
-
+$(TARGET_ELF): $(OBJS)
+	$(CC) $(LDFLAGS) -o $(TARGET_ELF) $(OBJS)
 
 $(DEP_FILE): $(BUILD_DIR) $(DEPS)
 	cat $(DEPS) > $(DEP_FILE)
