@@ -364,7 +364,6 @@ bin: $(TARGET_BIN)
 hex: $(TARGET_HEX)
 
 clean:
-	cd stmlib/third_party/libopencm3 && make clean && cd ../../../
 	$(REMOVE) $(OBJS) $(TARGETS) $(DEP_FILE) $(DEPS)
 
 depends: $(DEPS)
