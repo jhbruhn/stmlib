@@ -208,7 +208,7 @@ INCFLAGS = \
 			-D$(SYSCLOCK)=$(F_CPU)
 
 CCFLAGS = \
-			-g -Og -Wall -Werror -Wno-unused-local-typedefs -Wno-strict-aliasing \
+			-g -Wall -Werror -Wno-unused-local-typedefs -Wno-strict-aliasing \
 			-fasm \
 			-finline \
 			-finline-functions-called-once \
@@ -405,7 +405,11 @@ $(COMBO_BIN): $(TARGET_HEX) $(BOOTLOADER_HEX)
 BASE_JTAG_CMD = $(OPENOCD_BIN_PATH)openocd \
 			-s $(OPENOCD_SCRIPT_PATH) \
 			-f $(OPENOCD_INTERFACE_SCRIPT) \
-			-f $(OPENOCD_TARGET_SCRIPT) \
+
+ifeq ($(FAMILY),f0xx)
+BASE_JTAG_CMD +=	-c "transport select swd"
+endif
+BASE_JTAG_CMD +=	-f $(OPENOCD_TARGET_SCRIPT) \
 			-c "init" -c "halt" -c "sleep 200"
 
 POSTLUDE = -c "sleep 200" -c "reset run" -c "shutdown"
