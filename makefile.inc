@@ -343,7 +343,7 @@ RESOURCE_COMPILER = stmlib/tools/resources_compiler.py
 resources: $(TARGET)/resources.cc
 
 $(TARGET)/resources.cc: $(wildcard $(RESOURCES)/*.py)
-		python $(RESOURCE_COMPILER) $(RESOURCES)/resources.py
+		python2 $(RESOURCE_COMPILER) $(RESOURCES)/resources.py
 
 
 # ------------------------------------------------------------------------------
