@@ -131,6 +131,7 @@ FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F0xx_StdPeriph_Driver
 ARCHFLAGS = -mcpu=cortex-m0 -mthumb -mthumb-interwork -funroll-loops
 ARCH_DEFINE = GCC_ARMCM0
 OPENOCD_TARGET = f0x
+OZONE_DEVICE = STM32F030C8
 
 else ifeq ($(FAMILY),f7xx)
 
