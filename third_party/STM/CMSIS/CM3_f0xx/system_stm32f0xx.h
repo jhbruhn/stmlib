@@ -2,25 +2,17 @@
   ******************************************************************************
   * @file    system_stm32f0xx.h
   * @author  MCD Application Team
-  * @version V1.5.0
-  * @date    05-December-2014
-  * @brief   CMSIS Cortex-M0 Device Peripheral Access Layer System Header File.
+  * @brief   CMSIS Cortex-M0 Device System Source File for STM32F0xx devices.  
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT 2014 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
-  * You may not use this file except in compliance with the License.
-  * You may obtain a copy of the License at:
-  *
-  *        http://www.st.com/software_license_agreement_liberty_v2
-  *
-  * Unless required by applicable law or agreed to in writing, software 
-  * distributed under the License is distributed on an "AS IS" BASIS, 
-  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  * See the License for the specific language governing permissions and
-  * limitations under the License.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
@@ -55,8 +47,17 @@
 /** @addtogroup STM32F0xx_System_Exported_types
   * @{
   */
-
+  /* This variable is updated in three ways:
+      1) by calling CMSIS function SystemCoreClockUpdate()
+      3) by calling HAL API function HAL_RCC_GetHCLKFreq()
+      3) by calling HAL API function HAL_RCC_ClockConfig()
+         Note: If you use this function to configure the system clock; then there
+               is no need to call the 2 first functions listed above, since SystemCoreClock
+               variable is updated automatically.
+  */
 extern uint32_t SystemCoreClock;          /*!< System Clock Frequency (Core Clock) */
+extern const uint8_t AHBPrescTable[16];   /*!< AHB prescalers table values */
+extern const uint8_t APBPrescTable[8];    /*!< APB prescalers table values */
 
 /**
   * @}
