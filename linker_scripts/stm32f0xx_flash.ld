@@ -43,11 +43,18 @@ SECTIONS
     *(.glue_7t)
     KEEP (*(.init))
     KEEP (*(.fini))
+
+    . = ALIGN(4);
+    __init_array_start = .;
+    KEEP(*(.init_array)) /* C++ constructors */
+    KEEP(*(.ctors))      /* vtable init */
+    __init_array_end = .;
+
     . = ALIGN(16);
      _etext = .;
      _sidata = _etext;
   } >FLASH
-  
+
   .data : AT ( _sidata )
   {
     . = ALIGN(16);
@@ -70,10 +77,10 @@ SECTIONS
     . = ALIGN(16);
    _ebss = . ;
   } >RAM
-  
+
   PROVIDE ( end = _ebss );
   PROVIDE ( _end = _ebss );
-  
+
   ._user_heap_stack :
   {
     . = ALIGN(16);
@@ -83,7 +90,7 @@ SECTIONS
     . = . + _Min_Stack_Size;
     . = ALIGN(16);
   } >RAM
-  
+
   DISCARD :
   {
     libc.a ( * )

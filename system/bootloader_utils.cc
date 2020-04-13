@@ -36,8 +36,8 @@
   #include <stm32f0xx_hal_conf.h>
 #endif  // STM32F0XX
 
-#ifdef STM32F37X
-  #include <stm32f37x_conf.h>
+#ifdef STM32F3XX
+  #include <stm32f3xx_hal.h>
 #endif  // STM32F37X
 
 #ifdef STM32F10X

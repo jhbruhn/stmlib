@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-// 
+//
 // See http://creativecommons.org/licenses/MIT/ for more information.
 //
 // -----------------------------------------------------------------------------
@@ -43,9 +43,11 @@
 #ifndef STMLIB_SYSTEM_PAGE_STORAGE_H_
 #define STMLIB_SYSTEM_PAGE_STORAGE_H_
 
-#ifdef STM32F37X
+#include "stm32f3xx_hal_flash.h"
+#include "stm32f3xx_hal_flash_ex.h"
+#ifdef STM32F3XX
 
-  #include <stm32f37x_conf.h>
+  #include <stm32f3xx_hal_conf.h>
 
 #else
 
@@ -62,7 +64,17 @@
 #include "stmlib/stmlib.h"
 #include "stmlib/system/flash_programming.h"
 
+static void ErasePage(uint32_t pageNumber) {
+  uint32_t pageError;
+  FLASH_EraseInitTypeDef erase;
+  erase.TypeErase = FLASH_TYPEERASE_PAGES;
+  erase.NbPages = 1;
+  erase.PageAddress = pageNumber;
+  HAL_FLASHEx_Erase(&erase, &pageError);
+}
 namespace stmlib {
+
+
 
 // Class for storing calibration and state data in a same sector of flash
 // without having to rewrite the calibration data every time the state is
@@ -71,7 +83,7 @@ namespace stmlib {
 // Data is stored in a RIFF-ish format, with the peculiarity that the size
 // field of the header is 16-bit instead of 32-bit - the remaining 16 bits being
 // used to store a naive checksum of the chunk data.
-// 
+//
 // +----+-----------------+----+------------+----+------------+----+--
 // |HEAD|CALIBRATION CHUNK|HEAD|STATE CHUNK1|HEAD|STATE CHUNK2|HEAD|..
 // +----+-----------------+----+------------+----+------------+----+--
@@ -129,7 +141,7 @@ class ChunkStorage {
     if (chunk_address(next_state_chunk_index_ + 1) > flash_end) {
       Format();
     } else {
-      FLASH_Unlock();
+      HAL_FLASH_Unlock();
       WriteChunk(next_state_chunk_index_, state_data_);
       next_state_chunk_index_++;
     }
@@ -141,11 +153,11 @@ class ChunkStorage {
 
  private:
    void Format() {
-    FLASH_Unlock();
+    HAL_FLASH_Unlock();
     for (uint32_t address = flash_start;
          address < flash_end;
          address += PAGE_SIZE) {
-      FLASH_ErasePage(address);
+      ErasePage(address);
     }
     WriteChunk(0, persistent_data_);
     WriteChunk(1, state_data_);
@@ -182,7 +194,7 @@ class ChunkStorage {
     const uint32_t* words = (const uint32_t*)(data);
     size_t size = (sizeof(T) + 3) & ~0x03;
     while (size) {
-      FLASH_ProgramWord(address, *words);
+      HAL_FLASH_Program(FLASH_PROC_PROGRAMWORD, address, *words);
       address += 4;
       size -= 4;
       ++words;
@@ -225,28 +237,28 @@ class Storage {
   enum {
     FLASH_STORAGE_BASE = last_address - num_pages * PAGE_SIZE
   };
-  
+
   template<typename T>
   static void Save(const T& data) {
     Save(data, 0);
   }
-  
+
   template<typename T>
   static void Save(const T& data, uint8_t page_index) {
     Save((void*)(&data), sizeof(T), page_index);
   }
 
   static void Save(const void* data, size_t data_size, uint8_t page_index) {
-    FLASH_Unlock();
-    FLASH_ErasePage(FLASH_STORAGE_BASE + page_index * PAGE_SIZE);
+    HAL_FLASH_Unlock();
+    ErasePage(FLASH_STORAGE_BASE + page_index * PAGE_SIZE);
     WriteBlock(FLASH_STORAGE_BASE + page_index * PAGE_SIZE, data, data_size);
   };
-  
+
   template<typename T>
   static bool Load(T* data) {
     return Load(data, 0);
   }
-  
+
   template<typename T>
   static bool Load(T* data, uint8_t page_index) {
     return Load((void*)(data), sizeof(T), page_index);
@@ -258,18 +270,18 @@ class Storage {
     uint16_t checksum = (*(uint16_t*)(base + data_size));
     return checksum == Checksum(data, data_size);
   };
-  
+
   template<typename T>
   static void ParsimoniousSave(const T& data, uint16_t* version_token) {
     return ParsimoniousSave((void*)(&data), sizeof(T), version_token);
   }
-  
+
   static void ParsimoniousSave(
       const void* data,
       size_t data_size,
       uint16_t* version_token) {
     bool wrapped_around = false;
-    
+
     // 2 bytes of checksum and 2 bytes of version are added to the block.
     size_t block_size = data_size + 2 + 2;
     uint32_t start = FLASH_STORAGE_BASE + block_size * *version_token;
@@ -279,11 +291,11 @@ class Storage {
       start = FLASH_STORAGE_BASE;
       wrapped_around = true;
     }
-    FLASH_Unlock();
-    
+    HAL_FLASH_Unlock();
+
     if (wrapped_around) {
       for (size_t i = 0; i < num_pages; ++i) {
-        FLASH_ErasePage(FLASH_STORAGE_BASE + i * PAGE_SIZE);
+        ErasePage(FLASH_STORAGE_BASE + i * PAGE_SIZE);
       }
     } else {
       // If we will write into a new page, erase it.
@@ -292,33 +304,33 @@ class Storage {
       uint32_t this_page = start + block_size;
       this_page -= this_page % PAGE_SIZE;
       if (this_page != previous_page) {
-        FLASH_ErasePage(this_page);
+        ErasePage(this_page);
       }
     }
 
     WriteBlock(start, data, data_size);
-    FLASH_ProgramHalfWord(start + data_size + 2, *version_token);
+    HAL_FLASH_Program(FLASH_PROC_PROGRAMHALFWORD, start + data_size + 2, *version_token);
     *version_token = *version_token + 1;
   }
-  
+
   template<typename T>
   static bool ParsimoniousLoad(T* data, uint16_t* version_token) {
     return ParsimoniousLoad((void*)(data), sizeof(T), version_token);
   }
-  
+
   static bool ParsimoniousLoad(
       void* data,
       size_t data_size,
       uint16_t* version_token) {
     size_t block_size = data_size + 2 + 2;
 
-    // Try from the end of the reserved area until we find a block with 
-    // the right checksum and the right version index. 
+    // Try from the end of the reserved area until we find a block with
+    // the right checksum and the right version index.
     for (int16_t candidate_version = (num_pages * PAGE_SIZE / block_size) - 1;
          candidate_version >= 0;
          --candidate_version) {
       uint32_t start = FLASH_STORAGE_BASE + candidate_version * block_size;
-      
+
       memcpy(data, (void*)(start), data_size);
       uint16_t expected_checksum = Checksum(data, data_size);
       uint16_t read_checksum = (*(uint16_t*)(start + data_size));
@@ -333,22 +345,22 @@ class Storage {
     *version_token = 0;
     return false;
   }
-  
+
  private:
   static void WriteBlock(uint32_t start, const void* data, size_t data_size) {
     const uint32_t* words = (const uint32_t*)(data);
     size_t size = data_size;
     uint32_t address = start;
     while (size >= 4) {
-      FLASH_ProgramWord(address, *words++);
+      HAL_FLASH_Program(FLASH_PROC_PROGRAMWORD, address, *words++);
       address += 4;
       size -= 4;
     }
     // Write checksum.
     uint16_t checksum = Checksum(data, data_size);
-    FLASH_ProgramHalfWord(start + data_size, checksum);
+    HAL_FLASH_Program(FLASH_PROC_PROGRAMHALFWORD, start + data_size, checksum);
   }
-   
+
   static uint16_t Checksum(const void* data, uint16_t size) {
     uint16_t s = 0;
     const uint8_t* d = static_cast<const uint8_t*>(data);
