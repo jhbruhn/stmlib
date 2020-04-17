@@ -200,6 +200,10 @@ LD_SUFFIX =
 BASE_ADDRESS = 0x08000000
 endif
 
+ifeq ($(OPTIMIZE),TRUE)
+	ARCHFLAGS += -O2
+endif
+
 OPENOCD_TARGET_SCRIPT ?= target/stm32$(OPENOCD_TARGET).cfg
 
 # ------------------------------------------------------------------------------

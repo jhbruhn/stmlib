@@ -194,7 +194,8 @@ class ChunkStorage {
     const uint32_t* words = (const uint32_t*)(data);
     size_t size = (sizeof(T) + 3) & ~0x03;
     while (size) {
-      HAL_FLASH_Program(FLASH_PROC_PROGRAMWORD, address, *words);
+
+      HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, *words);
       address += 4;
       size -= 4;
       ++words;
@@ -309,7 +310,7 @@ class Storage {
     }
 
     WriteBlock(start, data, data_size);
-    HAL_FLASH_Program(FLASH_PROC_PROGRAMHALFWORD, start + data_size + 2, *version_token);
+    HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, start + data_size + 2, *version_token);
     *version_token = *version_token + 1;
   }
 
@@ -352,13 +353,13 @@ class Storage {
     size_t size = data_size;
     uint32_t address = start;
     while (size >= 4) {
-      HAL_FLASH_Program(FLASH_PROC_PROGRAMWORD, address, *words++);
+      HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, *words++);
       address += 4;
       size -= 4;
     }
     // Write checksum.
     uint16_t checksum = Checksum(data, data_size);
-    HAL_FLASH_Program(FLASH_PROC_PROGRAMHALFWORD, start + data_size, checksum);
+    HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, start + data_size, checksum);
   }
 
   static uint16_t Checksum(const void* data, uint16_t size) {
