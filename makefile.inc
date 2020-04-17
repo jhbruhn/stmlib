@@ -117,7 +117,7 @@ MODEL_DEFINE = STM32F3XX -DSTM32F373xC -DARM_MATH_CM4
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f373xc.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32f373x_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F3xx_HAL_Driver
-ARCHFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb-interwork -funroll-loops --specs=nano.specs -specs=nosys.specs
+ARCHFLAGS = -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -mthumb-interwork -funroll-loops --specs=nano.specs --specs=nosys.specs
 ARCH_DEFINE = GCC_ARMCM4
 OPENOCD_TARGET = f3x
 OZONE_DEVICE = STM32F373CC
@@ -128,7 +128,7 @@ MODEL_DEFINE = STM32F0XX -DSTM32F030x8
 STARTUP_OBJ   = $(BUILD_DIR)startup_stm32f030x8.o
 LINKER_SCRIPT = stmlib/linker_scripts/stm32f0xx_flash$(LD_SUFFIX).ld
 FW_STDDRIVER_DIR = $(STM32_PATH)/STM32F0xx_HAL_Driver
-ARCHFLAGS = -mcpu=cortex-m0 -mthumb -mthumb-interwork -funroll-loops --specs=nano.specs
+ARCHFLAGS = -mcpu=cortex-m0 -mthumb -mthumb-interwork -funroll-loops --specs=nano.specs --specs=nosys.specs
 ARCH_DEFINE = GCC_ARMCM0
 OPENOCD_TARGET = f0x
 OZONE_DEVICE = STM32F030C8
