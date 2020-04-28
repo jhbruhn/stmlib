@@ -200,8 +200,9 @@ LD_SUFFIX =
 BASE_ADDRESS = 0x08000000
 endif
 
+OPTIMIZE_FLAG ?= 2
 ifeq ($(OPTIMIZE),TRUE)
-	ARCHFLAGS += -O2
+	ARCHFLAGS += -O$(OPTIMIZE_FLAG)
 endif
 
 OPENOCD_TARGET_SCRIPT ?= target/stm32$(OPENOCD_TARGET).cfg
@@ -358,7 +359,7 @@ RESOURCE_COMPILER = stmlib/tools/resources_compiler.py
 resources: $(TARGET)/resources.cc
 
 $(TARGET)/resources.cc: $(wildcard $(RESOURCES)/*.py)
-		python2 $(RESOURCE_COMPILER) $(RESOURCES)/resources.py
+		python $(RESOURCE_COMPILER) $(RESOURCES)/resources.py
 
 
 # ------------------------------------------------------------------------------
