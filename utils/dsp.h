@@ -8,10 +8,10 @@
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-// 
+//
 // See http://creativecommons.org/licenses/MIT/ for more information.
 //
 // -----------------------------------------------------------------------------
@@ -53,6 +53,12 @@ inline int16_t Interpolate1022(const int16_t* table, uint32_t phase)
   __attribute__((always_inline));
 
 inline int16_t Interpolate115(const int16_t* table, uint32_t phase)
+  __attribute__((always_inline));
+
+inline uint16_t Interpolate124(const uint16_t* table, uint16_t phase)
+  __attribute__((always_inline));
+
+inline uint16_t InverseInterpolate124(const uint16_t* table, uint16_t phase)
   __attribute__((always_inline));
 
 inline int16_t Crossfade(
@@ -132,6 +138,18 @@ inline int16_t Interpolate115(const int16_t* table, uint16_t phase) {
   int32_t a = table[phase >> 5];
   int32_t b = table[(phase >> 5) + 1];
   return a + ((b - a) * static_cast<int32_t>(phase & 0x1f) >> 5);
+}
+
+inline uint16_t Interpolate124(const uint16_t* table, uint16_t phase) {
+  int32_t a = table[phase >> 4];
+  int32_t b = table[(phase >> 4) + 1];
+  return a + ((b - a) * static_cast<int32_t>(phase & 0xf) >> 4);
+}
+
+inline uint16_t InverseInterpolate124(const uint16_t* table, uint16_t phase) {
+  int32_t a = table[4096 - 1 - (phase >> 4)];
+  int32_t b = table[4096 - 1 - ((phase >> 4) + 1)];
+  return a + ((b - a) * static_cast<int32_t>(phase & 0xf) >> 4);
 }
 
 inline int16_t Crossfade(
