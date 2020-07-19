@@ -33,7 +33,7 @@
 #endif  // STM32F4XX
 
 #ifdef STM32F0XX
-  #include <stm32f0xx_hal_conf.h>
+  #include <stm32f0xx_hal.h>
 #endif  // STM32F0XX
 
 #ifdef STM32F3XX
@@ -51,6 +51,28 @@
 #ifdef STM32G4XX
   #include <stm32g4xx_hal_conf.h>
 #endif  // STM32G4XX
+
+#ifdef STM32F0XX
+extern "C" {
+
+const uint32_t kStartAddress = 0x08002000;
+
+volatile uint32_t* VectorTable = (volatile uint32_t*)0x20000000;
+
+void RelocateVectorTable(void) {
+  uint32_t i = 0;
+  __disable_irq();
+
+  for(i = 0; i < 48; i++) {
+    VectorTable[i] = *(__IO uint32_t*)(kStartAddress + (i<<2));
+  }
+  __HAL_RCC_SYSCFG_CLK_ENABLE();
+  __HAL_SYSCFG_REMAPMEMORY_SRAM();
+
+  __enable_irq();
+}
+}
+#endif
 
 namespace stmlib {
 
