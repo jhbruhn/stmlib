@@ -43,8 +43,6 @@
 #ifndef STMLIB_SYSTEM_PAGE_STORAGE_H_
 #define STMLIB_SYSTEM_PAGE_STORAGE_H_
 
-#include "stm32f3xx_hal_flash.h"
-#include "stm32f3xx_hal_flash_ex.h"
 #ifdef STM32F3XX
 
   #include <stm32f3xx_hal_conf.h>
@@ -52,7 +50,7 @@
 #else
 
   #ifdef STM32F0XX
-    #include <stm32f0xx_conf.h>
+    #include <stm32f0xx_hal.h>
   #else
     #include <stm32f10x_conf.h>
   #endif  // STM32F0XX
@@ -191,14 +189,14 @@ class ChunkStorage {
 
   template<typename T>
   void FlashWrite(uint32_t address, const T* data) {
-    const uint32_t* words = (const uint32_t*)(data);
+    const uint8_t* bytes = (const uint8_t*)(data);
     size_t size = (sizeof(T) + 3) & ~0x03;
     while (size) {
-
-      HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, address, *words);
-      address += 4;
-      size -= 4;
-      ++words;
+      const uint16_t halfworddata =  bytes[1] << 8 | bytes[0];
+      HAL_FLASH_Program(FLASH_TYPEPROGRAM_HALFWORD, address, halfworddata);
+      address += 2;
+      size -= 2;
+      bytes += 2;
     }
   }
 
