@@ -28,7 +28,7 @@
 
 #ifndef STMLIB_TEST_WAV_WRITER_H_
 #define STMLIB_TEST_WAV_WRITER_H_
-
+#include <inttypes.h>
 #include <cstdio>
 #include <cstdlib>
 
